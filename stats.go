@@ -149,6 +149,12 @@ func (t *TraceRoute) PrintRow(table *tablewriter.Table, id int) string {
 	if id == 0 {
 		hid = "TCP"
 	}
+
+	// maxLens := map[string]int{}
+	// for key, val := range t.Metric[id] {
+	// 	maxLens[key] = len(val.LatencyDescribe.Mean)
+	// }
+
 	for _, v := range t.Metric[id] {
 
 		latency := fmt.Sprintf("%8.2fms", v.LatencyDescribe.Mean/1000)
@@ -169,20 +175,21 @@ func (t *TraceRoute) PrintRow(table *tablewriter.Table, id int) string {
 			}
 		}
 
-		city := fmt.Sprintf("%-16.16s", v.GeoLocation.City)
-		country := fmt.Sprintf("%-16.16s", v.GeoLocation.Country)
-		asn := fmt.Sprintf("%-10d", v.GeoLocation.ASN)
+		country := fmt.Sprintf("%.16s", v.GeoLocation.Country)
+		asn := fmt.Sprintf("%10d", v.GeoLocation.ASN)
 
-		sp := fmt.Sprintf("%-16.16s", v.GeoLocation.SPName)
-		saddr := fmt.Sprintf("%-21.21s", v.Addr)
+		sp := fmt.Sprintf("%.16s", v.GeoLocation.SPName)
+		saddr := fmt.Sprintf("%.21s", v.Addr)
 
 		if RespAddr == "" {
 			RespAddr = v.Addr
 		}
-		sname := fmt.Sprintf("%-26.26s", v.Name)
+		sname := fmt.Sprintf("%.26s", v.Name)
 		if t.WideMode {
-			sname = fmt.Sprintf("%-30.30s", v.Name)
-			sp = fmt.Sprintf("%-30.30s", v.GeoLocation.SPName)
+			city := fmt.Sprintf("%.16s", v.GeoLocation.City)
+			country = fmt.Sprintf("%.20s", v.GeoLocation.Country)
+			sname = fmt.Sprintf("%.30s", v.Name)
+			sp = fmt.Sprintf("%.30s", v.GeoLocation.SPName)
 			distance := geoip.ComputeDistance(t.Latitude, t.Longitude, v.GeoLocation.Latitude, v.GeoLocation.Longitude)
 
 			latencyByDistance := distance/75 + float64(id)*3
