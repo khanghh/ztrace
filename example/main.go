@@ -11,8 +11,8 @@ import (
 var (
 	dst      string  = ""
 	src      string  = ""
-	asndb    string  = "geoip/asn.mmdb"
-	geodb    string  = "geoip/geoip.mmdb"
+	asndb    string  = "/usr/share/GeoIP/asn.mmdb"
+	geodb    string  = "/usr/share/GeoIP/geoip.mmdb"
 	protocol string  = "udp"
 	maxPath  int     = 16
 	maxTTL   int     = 64
