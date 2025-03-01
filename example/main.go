@@ -8,46 +8,40 @@ import (
 	"github.com/zartbot/ztrace"
 )
 
-var cmd = struct {
-	dst      string
-	src      string
-	protocol string
-	maxPath  int
-	maxTTL   int
-	pps      float64
-	wmode    bool
-	lat      float64
-	long     float64
-}{
-	"",
-	"",
-	"udp",
-	16,
-	64,
-	1,
-	false,
-	31.02,
-	121.1,
-}
+var (
+	dst      string  = ""
+	src      string  = ""
+	asndb    string  = "geoip/asn.mmdb"
+	geodb    string  = "geoip/geoip.mmdb"
+	protocol string  = "udp"
+	maxPath  int     = 16
+	maxTTL   int     = 64
+	pps      float64 = 1
+	wmode    bool    = false
+	lat      float64 = 31.02
+	long     float64 = 121.1
+)
 
 func init() {
-	flag.StringVar(&cmd.protocol, "proto", cmd.protocol, "Protocol[icmp|tcp|udp]")
-	flag.StringVar(&cmd.src, "src", cmd.src, "Source ")
-	flag.IntVar(&cmd.maxPath, "path", cmd.maxPath, "Max ECMP Number")
-	flag.IntVar(&cmd.maxPath, "p", cmd.maxPath, "Max ECMP Number")
-	flag.IntVar(&cmd.maxTTL, "ttl", cmd.maxTTL, "Max TTL")
-	flag.Float64Var(&cmd.pps, "rate", cmd.pps, "Packet Rate per second")
-	flag.Float64Var(&cmd.pps, "r", cmd.pps, "Packet Rate per second")
-	flag.BoolVar(&cmd.wmode, "wide", cmd.wmode, "Widescreen mode")
-	flag.BoolVar(&cmd.wmode, "w", cmd.wmode, "Widescreen mode")
-	flag.Float64Var(&cmd.lat, "lat", cmd.lat, "Latitude")
-	flag.Float64Var(&cmd.lat, "long", cmd.long, "Longitude")
+	flag.StringVar(&protocol, "proto", protocol, "Protocol[icmp|tcp|udp]")
+	flag.StringVar(&src, "src", src, "Source ")
+	flag.StringVar(&asndb, "asndb", asndb, "ASN Database")
+	flag.StringVar(&geodb, "geoipdb", geodb, "Geo Database")
+	flag.IntVar(&maxPath, "path", maxPath, "Max ECMP Number")
+	flag.IntVar(&maxPath, "p", maxPath, "Max ECMP Number")
+	flag.IntVar(&maxTTL, "ttl", maxTTL, "Max TTL")
+	flag.Float64Var(&pps, "rate", pps, "Packet Rate per second")
+	flag.Float64Var(&pps, "r", pps, "Packet Rate per second")
+	flag.BoolVar(&wmode, "wide", wmode, "Widescreen mode")
+	flag.BoolVar(&wmode, "w", wmode, "Widescreen mode")
+	flag.Float64Var(&lat, "lat", lat, "Latitude")
+	flag.Float64Var(&lat, "long", long, "Longitude")
 	flag.Parse()
 }
 
 func PrintUsage() {
 	fmt.Println("Usage:")
-	fmt.Println("  ./ztrace [-src source] [-proto protocol] [-ttl ttl] [-rate packetRate] [-wide Widescreen mode] [-path NumOfECMPPath] host")
+	fmt.Println("  ./ztrace [-src source] [-proto protocol] [-ttl ttl] [-rate packetRate] [-wide Widescreen mode] [-path NumOfECMPPath] [-ansdb asndb] [-geodb geodb] host")
 	fmt.Println("Example:")
 	fmt.Println(" ./ztrace www.cisco.com")
 	fmt.Println(" ./ztrace -ttl 30 -rate 1 -path 8 -wide www.cisco.com")
@@ -56,18 +50,17 @@ func PrintUsage() {
 }
 
 func main() {
-
 	if flag.NArg() != 1 {
 		PrintUsage()
 		return
 	} else {
-		cmd.dst = flag.Arg(0)
-		fmt.Println(cmd.dst)
+		dst = flag.Arg(0)
+		fmt.Println(dst)
 	}
 
-	t := ztrace.New(cmd.protocol, cmd.dst, cmd.src, cmd.maxPath, uint8(cmd.maxTTL), float32(cmd.pps), 0, cmd.wmode, "geoip/asn.mmdb", "geoip/geoip.mmdb")
-	t.Latitude = cmd.lat
-	t.Longitude = cmd.long
+	t := ztrace.New(protocol, dst, src, maxPath, uint8(maxTTL), float32(pps), 0, wmode, asndb, geodb)
+	t.Latitude = lat
+	t.Longitude = long
 
 	t.Start()
 	go t.Report(time.Second)
