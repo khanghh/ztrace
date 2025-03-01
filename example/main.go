@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/zartbot/ztrace"
@@ -11,8 +12,8 @@ import (
 var (
 	dst      string  = ""
 	src      string  = ""
-	asndb    string  = "/usr/share/GeoIP/asn.mmdb"
-	geodb    string  = "/usr/share/GeoIP/geoip.mmdb"
+	asndb    string  = ""
+	geodb    string  = ""
 	protocol string  = "udp"
 	maxPath  int     = 16
 	maxTTL   int     = 64
@@ -26,7 +27,7 @@ func init() {
 	flag.StringVar(&protocol, "proto", protocol, "Protocol[icmp|tcp|udp]")
 	flag.StringVar(&src, "src", src, "Source ")
 	flag.StringVar(&asndb, "asndb", asndb, "ASN Database")
-	flag.StringVar(&geodb, "geoipdb", geodb, "Geo Database")
+	flag.StringVar(&geodb, "geodb", geodb, "Geo Database")
 	flag.IntVar(&maxPath, "path", maxPath, "Max ECMP Number")
 	flag.IntVar(&maxPath, "p", maxPath, "Max ECMP Number")
 	flag.IntVar(&maxTTL, "ttl", maxTTL, "Max TTL")
@@ -56,6 +57,14 @@ func main() {
 	} else {
 		dst = flag.Arg(0)
 		fmt.Println(dst)
+	}
+
+	if asndb == "" {
+		asndb = os.Getenv("ASNDB")
+	}
+
+	if geodb == "" {
+		geodb = os.Getenv("GEODB")
 	}
 
 	t := ztrace.New(protocol, dst, src, maxPath, uint8(maxTTL), float32(pps), 0, wmode, asndb, geodb)
